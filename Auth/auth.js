@@ -4,7 +4,6 @@ const User = require("../models/User");
 //Register
 exports.register = async (req, res, next) => {
     const {username, password} = req.body;
-    console.log("password: ", password);
     if (password.length < 6) {
       return res.status(400).json({ message: "Password less than 6 characters" })
     }
@@ -30,6 +29,7 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   const { username, password } = req.body
   // Check if username and password is provided
+  console.log("user: ", username);
   if (!username || !password) {
     return res.status(400).json({
       message: "Username or Password not present",
