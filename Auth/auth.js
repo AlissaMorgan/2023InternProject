@@ -29,7 +29,6 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   const { username, password } = req.body
   // Check if username and password is provided
-  console.log("user: ", username);
   if (!username || !password) {
     return res.status(400).json({
       message: "Username or Password not present",
@@ -54,4 +53,18 @@ exports.login = async (req, res, next) => {
       error: error.message,
     })
   }
+}
+
+exports.deleteUser = async (req, res, next) => {
+  const { id } = req.body
+  await User.findById(id)
+    .then(user => user.deleteOne())
+    .then(user =>
+      res.status(201).json({ message: "User successfully deleted", user })
+    )
+    .catch(error =>
+      res
+        .status(400)
+        .json({ message: "An error occurred", error: error.message })
+    )
 }
