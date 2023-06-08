@@ -1,7 +1,6 @@
 {
   "name": "intern_project",
   "version": "1.0.0",
-  "description": "",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -86,5 +85,6 @@
     "vary": "^1.1.2",
     "webidl-conversions": "^7.0.0",
     "whatwg-url": "^11.0.0"
-  }
+  },
+  "description": ""
 }
