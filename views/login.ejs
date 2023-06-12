@@ -1,55 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
-
+  <style>
+    .content {
+      max-width: 500px;
+      margin: auto;
+    }
+    </style>
 <head>
+  <title> Login Page </title>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Page</title>
-</head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+  body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif;}
+  body, html {
+    height: 100%;
+    color: #777;
+    line-height: 1.8;
+  }
+  
+  /* Create a Parallax Effect */
+  .bgimg-1, .bgimg-2, .bgimg-3 {
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  
+  /* Second image (Portfolio) */
+  .bgimg-2 {
+    background-image: url("/w3images/parallax2.jpg");
+    min-height: 400px;
+  }
+  
+  .w3-wide {letter-spacing: 10px;}
+  .w3-hover-opacity {cursor: pointer;}
+  
+  /* Turn off parallax scrolling for tablets and phones */
+  @media only screen and (max-device-width: 1600px) {
+    .bgimg-1, .bgimg-2, .bgimg-3 {
+      background-attachment: scroll;
+      min-height: 400px;
+    }
+  }
+  </style>
+  </head>
+  <body>
 
-<body>
-  <h1>Login Page</h1>
-  <form>
-    <div class="error" style="background-color: rgb(241, 146, 146);"></div>
-    <div class="success" style="background-color: rgb(102, 209, 128);"></div><br>
-    <label for="username" >Username</label><br>
-    <input type="text" id="username" required/><br>
-    <label for="password">Password</label><br>
-    <input type="text" id="password" required><br>
-    <input type="submit" value="login"><br>
-  </form>
-  <a href="/register">Don't have an account? Register</a>
+    <!-- Navbar (sit on top) -->
+    <div class="w3-top" style="background-color: rgb(255, 255, 255);">
+      <div class="w3-bar" id="myNavbar">
+        <a class="w3-bar-item w3-button w3-hover-black w3-hide-medium w3-hide-large w3-right" href="javascript:void(0);" onclick="toggleFunction()" title="Toggle Navigation Menu">
+          <i class="fa fa-bars"></i>
+        </a>
+        <a href="/" class="w3-bar-item w3-button">HOME</a>
+        <a href="/login" class="w3-bar-item w3-button w3-hide-small"><i class="fa fa-user"></i> LOGIN</a>
+        <a href="/register" class="w3-bar-item w3-button w3-hide-small"><i class="fa fa-th"></i> REGISTER</a>
+        <a href="#" class="w3-bar-item w3-button w3-hide-small w3-right w3-hover-red">
+          <i class="fa fa-search"></i>
+        </a>
+      </div>
+    
+      <!-- Navbar on small screens -->
+      <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium">
+        <a href="/login" class="w3-bar-item w3-button" onclick="toggleFunction()">LOGIN</a>
+        <a href="/register" class="w3-bar-item w3-button" onclick="toggleFunction()">REGISTER</a>
+        <a href="#" class="w3-bar-item w3-button">SEARCH</a>
+      </div>
+    </div>
+    
+    <!-- Login -->
+    <div class="w3-row" id="form">
+      <div class="w3-center">
+        <br>
+        <h1>Login Page</h1>
+        <form>
+          <div class="error" style="background-color: rgb(241, 146, 146);"></div>
+          <div class="success" style="background-color: rgb(102, 209, 128);"></div><br>
+          <label for="username" >Username</label><br>
+          <input type="text" id="username" required/><br>
+          <label for="password">Password</label><br>
+          <input type="password" id="password" required><br>
+          <br>
+          <input type="submit" value="login"><br>
+        </form>
+        <a href="/register">Don't have an account? Register</a>
+      </div>
+    </div>
+     
+    <script>
 
-  <script>
-    const form = document.querySelector('form');
-    const username = document.querySelector('#username')
-    const password = document.querySelector('#password');
-    const displayErr = document.querySelector('.error');
-    const displaySuc = document.querySelector('.success')
+      const form = document.querySelector('form');
+      const username = document.querySelector('#username')
+      const password = document.querySelector('#password');
+      const displayErr = document.querySelector('.error');
+      const displaySuc = document.querySelector('.success')
 
-   form.addEventListener('submit', async (e) => {
-      e.preventDefault()
-      displayErr.textContent = ''
-      displaySuc.textContent = ''
-      try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          body: JSON.stringify({ username: username.value, password: password.value }),
-          headers: { 'Content-Type': 'application/json' }
-        })
-        const data = await res.json()
-        if (res.status === 400) {
-          return displayErr.textContent = `${data.message}. ${data.error ? data.error : ''}`
-        }
-        if(res.status === 200){
-           return displaySuc.textContent = `${data.message}.`
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        displayErr.textContent = ''
+        displaySuc.textContent = ''
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ username: username.value, password: password.value }),
+            headers: { 'Content-Type': 'application/json' }
+          })
+          const data = await res.json()
+          if (res.status === 400) {
+            return displayErr.textContent = `${data.message}. ${data.error ? data.error : ''}`
           }
-      } catch (err) {
-        console.log(err.message)
-      }
+          if(res.status === 200){
+            return displaySuc.textContent = `${data.message}.`
+            }
+        } catch (err) {
+          console.log(err.message)
+        }
 
-    })
-  </script>
-</body>
-
+      })
+    
+    // Change style of navbar on scroll
+    window.onscroll = function() {myFunction()};
+    function myFunction() {
+        var navbar = document.getElementById("myNavbar");
+        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+            navbar.className = "w3-bar" + " w3-card" + " w3-animate-top" + " w3-white";
+        } else {
+            navbar.className = navbar.className.replace(" w3-card w3-animate-top w3-white", "");
+        }
+    }
+    
+    // Used to toggle the menu on small screens when clicking on the menu button
+    function toggleFunction() {
+        var x = document.getElementById("navDemo");
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else {
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }
+    </script>
+    
+    </body>
 </html>
