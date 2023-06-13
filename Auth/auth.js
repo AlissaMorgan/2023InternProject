@@ -16,7 +16,7 @@ exports.register = async (req, res, next) => {
       .then((user) =>
         res.status(200).json({
           message: "User successfully created",
-            user,
+            user: username,
         })
       )
       .catch((error) =>
@@ -61,7 +61,7 @@ exports.login = async (req, res, next) => {
       error: error.message,
     })
   }
-}
+};
 
 //Delete
 exports.deleteUser = async (req, res, next) => {
@@ -76,4 +76,35 @@ exports.deleteUser = async (req, res, next) => {
         .status(400)
         .json({ message: "An error occurred", error: error.message })
     )
-}
+};
+
+
+//Delete
+exports.deleteAllUsers = async (req, res, next) => {
+  await User.find({})
+    .then((users) => {
+      const userFunction = users.map((user) => user.deleteOne());
+      res.status(200).json({ user: userFunction });
+    })
+    .catch((err) =>
+      res.status(401).json({ message: "Not successful", error: err.message })
+    );
+};
+
+//Get All Users
+exports.getUsers = async (req, res, next) => {
+  await User.find({})
+    .then((users) => {
+      const userFunction = users.map((user) => {
+        const container = {};
+        container.username = user.username;
+        container.id = user._id;
+
+        return container;
+      });
+      res.status(200).json({ user: userFunction });
+    })
+    .catch((err) =>
+      res.status(401).json({ message: "Not successful", error: err.message })
+    );
+};
