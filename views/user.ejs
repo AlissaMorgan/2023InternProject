@@ -78,11 +78,27 @@
     <!-- First Parallax Image with Logo Text -->
     <div class="bgimg-1 w3-display-container w3-opacity-min" id="home">
       <div class="w3-display-middle" style="white-space:nowrap;">
-        <span class="w3-center w3-padding-large w3-black w3-xlarge w3-wide w3-animate-opacity">MY <span class="w3-hide-small">INTERN</span> PROJECT</span>
+        <span class="w3-center w3-padding-large w3-black w3-xlarge w3-wide w3-animate-opacity">MY <span class="w3-hide-small">INTERN </span> PROJECT </span>
+        <ul class="w3-center w3-padding-large w3-black w3-xlarge w3-wide w3-animate-opacity"></ul>
       </div>
     </div>
      
     <script>
+
+const ul = document.querySelector('ul')
+    const getUsers = async() => {
+      const res = await fetch('/api/auth/getUsers')
+      const data = await res.json()
+      data.user.map((mappedUser)=> {
+        if (mappedUser.username !== 'admin') {
+          let li = `<li> <b>Username</b> |  ${mappedUser.username} <br></li>`
+          ul.innerHTML += li
+        } else {
+          return null
+        }
+      })
+    }
+    getUsers()
     
     // Change style of navbar on scroll
     window.onscroll = function() {myFunction()};
