@@ -16,6 +16,7 @@ app.use("/api/auth", require("./Auth/route"));
 app.get("/", (req, res) => res.render("home"));
 app.get("/register", (req, res) => res.render("register"));
 app.get("/login", (req, res) => res.render("login"));
+app.get("/admin", (req, res) => res.render("user"));
 
 const server = app.listen(PORT, () =>
   console.log(`Server Connected to port ${PORT}`)

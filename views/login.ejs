@@ -113,6 +113,7 @@
             return displayErr.textContent = `${data.message}. ${data.error ? data.error : ''}`
           }
           if(res.status === 200){
+            location.assign('/admin')
             return displaySuc.textContent = `${data.message}.`
             }
         } catch (err) {
