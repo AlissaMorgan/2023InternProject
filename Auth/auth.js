@@ -38,7 +38,7 @@ exports.login = async (req, res, next) => {
     })
   }
   try {
-    const user = await User.findOne({ username })
+    const user = await User.findOne({ username });
     if (!user) {
       res.status(400).json({
         message: "Login not successful",
