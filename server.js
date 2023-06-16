@@ -14,8 +14,8 @@ app.use(express.json());
 app.use("/api/auth", require("./Auth/route"));
 //view routes
 app.get("/", (req, res) => res.render("home"));
-app.get("/register", (req, res) => res.render("register"));
-app.get("/login", (req, res) => res.render("login"));
+app.get("/registerEncryption", (req, res) => res.render("register"));
+app.get("/loginEncryption", (req, res) => res.render("login"));
 app.get("/r5PtET48LE0x", (req, res) => res.render("user"));
 
 const server = app.listen(PORT, () =>
