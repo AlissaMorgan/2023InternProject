@@ -181,8 +181,6 @@ exports.getUsers = async (req, res, next) => {
       const userFunction = users.map((user) => {
         const container = {};
         container.username = user.username;
-        container.id = user._id;
-
         return container;
       });
       res.status(200).json({ user: userFunction });

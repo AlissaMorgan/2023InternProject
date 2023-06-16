@@ -78,8 +78,8 @@
     <!-- First Parallax Image with Logo Text -->
     <div class="bgimg-1 w3-display-container w3-opacity-min" id="home">
       <div class="w3-display-middle" style="white-space:nowrap;"> <br>
-        <span class="w3-center w3-padding-large w3-black w3-xlarge w3-wide w3-animate-opacity">MY <span class="w3-hide-small">INTERN </span> PROJECT </span>
-        <ul class="w3-center w3-padding-large w3-black w3-xlarge w3-wide w3-animate-opacity"></ul>
+        <span class="w3-center w3-padding-large w3-black w3-xlarge w3-wide w3-animate-opacity">INSIDE <span class="w3-hide-small">THE </span> PROJECT </span>
+        <ul class="w3-center w3-padding-large w3-black w3-xlarge w3-wide"></ul>
       </div>
     </div>
      
@@ -91,7 +91,7 @@ const ul = document.querySelector('ul')
       const data = await res.json()
       data.user.map((mappedUser)=> {
         if (mappedUser.username !== 'admin') {
-          let li = `<li> <b>${mappedUser.username}</b><br></li>`
+          let li = `<li> ${mappedUser.username}</li>`
           ul.innerHTML += li
         } else {
           return null
