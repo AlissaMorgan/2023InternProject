@@ -2,6 +2,12 @@
 const { error } = require("console");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs")
+//Checking the crypto module
+const crypto = require('crypto');
+const algorithm = 'aes-256-cbc'; //Using AES encryption
+const key = crypto.randomBytes(32);
+const iv = crypto.randomBytes(16);
+
 //Create
 exports.register = async (req, res, next) => {
   const { username, password } = req.body;
@@ -63,21 +69,40 @@ exports.login = async (req, res, next) => {
   }
 };
 
+//Encrypting text
+function encrypt(text) {
+  let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
+  let encrypted = cipher.update(text);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };
+}
+
+// Decrypting text
+function decrypt(text) {
+  let iv = Buffer.from(text.iv, 'hex');
+  let encryptedText = Buffer.from(text.encryptedData, 'hex');
+  let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
+  let decrypted = decipher.update(encryptedText);
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+  return decrypted.toString();
+}
+
 //Create W/ encryption
 exports.registerEncryption = async (req, res, next) => {
   const { username, password } = req.body;
   if (password.length < 6) {
     return res.status(400).json({ message: "Password less than 6 characters" });
   }
-  bcrypt.hash(password, 10).then(async (hash) => {
+  var encryptedInfo = encrypt(password);
+    console.log(decrypt(encryptedInfo));
     await User.create({
       username: username,
-      password: hash,
+      password: encryptedInfo,
     })
       .then((user) =>
         res.status(200).json({
           message: "User successfully created",
-            user: username,
+            user,
         })
       )
       .catch((error) =>
@@ -86,8 +111,7 @@ exports.registerEncryption = async (req, res, next) => {
           error: error.message,
         })
       );
-    });
-  };
+};
 
 //Read
 exports.loginEncryption = async (req, res, next) => {
@@ -107,14 +131,14 @@ exports.loginEncryption = async (req, res, next) => {
       })
     } else {
       // comparing given password with hashed password
-      bcrypt.compare(password, user.password).then(function (result) {
-        result
-          ? res.status(200).json({
+      console.log(user.password);
+      var decryptInfo = decrypt(user.password);
+      password == decryptInfo ?
+      res.status(200).json({
               message: "Login successful",
               user,
             })
           : res.status(400).json({ message: "Login not succesful" })
-      })
     }
   } catch (error) {
     res.status(400).json({

@@ -1,3 +1,4 @@
+const { text } = require("express");
 const Mongoose = require("mongoose");
 
 const UserSchema = new Mongoose.Schema({
@@ -7,8 +8,7 @@ const UserSchema = new Mongoose.Schema({
     required: true,
   },
   password: {
-    type: String,
-    minlength: 6,
+    type: Object,
     required: true,
   },
   role: {
