@@ -1,12 +1,12 @@
 const express = require("express")
-const connectDB = require("./db");
+const connectDBEncrypt = require("./dbEncrypt");
 const app = express()
 const PORT = 5000
 
 app.set("view engine", "ejs");
 
 //Connecting the Database
-connectDB();
+connectDBEncrypt();
 
 //grant access to user's data from body
 app.use(express.json());
