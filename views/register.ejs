@@ -101,7 +101,7 @@
         displaySuc.textContent = ''
         try {
 
-        const res = await fetch('/api/auth/register', {
+        const res = await fetch('/api/auth/registerEncryption', {
           method: 'POST',
           body: JSON.stringify({ username: username.value, password: password.value }),
           headers: { 'Content-Type': 'application/json' }
