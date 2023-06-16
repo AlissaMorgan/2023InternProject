@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs")
 //Checking the crypto module
 const crypto = require('crypto');
 const algorithm = 'aes-256-cbc'; //Using AES encryption
-const key = crypto.randomBytes(32);
+const key = new Buffer.from('12345678123456781234567812345678');
 const iv = crypto.randomBytes(16);
 
 //Create
@@ -94,7 +94,6 @@ exports.registerEncryption = async (req, res, next) => {
     return res.status(400).json({ message: "Password less than 6 characters" });
   }
   var encryptedInfo = encrypt(password);
-    console.log(decrypt(encryptedInfo));
     await User.create({
       username: username,
       password: encryptedInfo,
@@ -130,8 +129,7 @@ exports.loginEncryption = async (req, res, next) => {
         error: "User not found",
       })
     } else {
-      // comparing given password with hashed password
-      console.log(user.password);
+      // compare decrypted password to text password
       var decryptInfo = decrypt(user.password);
       password == decryptInfo ?
       res.status(200).json({
