@@ -1,7 +1,7 @@
 // connect application to MongoDB
 const Mongoose = require("mongoose")
 // name of db is /internProj
-const localDB = 'mongodb://127.0.0.1:27017/internProj';
+const localDB = 'mongodb://127.0.0.1:27017/encrptDB';
 
 const connectDB = async () => {
   try{
