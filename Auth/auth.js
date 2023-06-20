@@ -112,8 +112,67 @@ exports.registerEncryption = async (req, res, next) => {
       );
 };
 
-//Read
+//Read W/ encryption
 exports.loginEncryption = async (req, res, next) => {
+  const { username, password } = req.body
+  // Check if username and password is provided
+  if (!username || !password) {
+    return res.status(400).json({
+      message: "Username or Password not present",
+    })
+  }
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      res.status(400).json({
+        message: "Login not successful",
+        error: "User not found",
+      })
+    } else {
+      // compare decrypted password to text password
+      var decryptInfo = decrypt(user.password);
+      password == decryptInfo ?
+      res.status(200).json({
+              message: "Login successful",
+              user,
+            })
+          : res.status(400).json({ message: "Login not succesful" })
+    }
+  } catch (error) {
+    res.status(400).json({
+      message: "An error occurred",
+      error: error.message,
+    })
+  }
+};
+
+//Create W/ encryption and Key DB
+exports.registerEncryptionAndKey = async (req, res, next) => {
+  const { username, password } = req.body;
+  if (password.length < 6) {
+    return res.status(400).json({ message: "Password less than 6 characters" });
+  }
+  var encryptedInfo = encrypt(password);
+    await User.create({
+      username: username,
+      password: encryptedInfo,
+    })
+      .then((user) =>
+        res.status(200).json({
+          message: "User successfully created",
+            user,
+        })
+      )
+      .catch((error) =>
+        res.status(400).json({
+          message: "User not successful created",
+          error: error.message,
+        })
+      );
+};
+
+//Read W/ encryption and Key db
+exports.loginEncryptionAndKey = async (req, res, next) => {
   const { username, password } = req.body
   // Check if username and password is provided
   if (!username || !password) {
