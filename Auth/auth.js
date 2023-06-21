@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs")
 //Checking the crypto module
 const crypto = require('crypto');
 const algorithm = 'aes-256-cbc'; //Using AES encryption
-const key = "12345678123456781234567812345678";
+//const key = "12345678123456781234567812345678"; //For loginEncryption and registerEncryption routes
 const iv = crypto.randomBytes(16);
 //Keys DB
 const mongoose = require("mongoose");
