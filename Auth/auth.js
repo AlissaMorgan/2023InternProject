@@ -183,13 +183,11 @@ exports.registerEncryptionAndKey = async (req, res, next) => {
       keyDB.once("disconnected", function () {
         console.log("MongoDB Connect to KeyDB is Closed");
       });
-    })
-    .then((user) =>
       res.status(200).json({
         message: "User successfully created",
           user,
       })
-    )
+    })
     .catch((error) =>
       res.status(400).json({
         message: "User not successful created",

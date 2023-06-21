@@ -56,15 +56,15 @@
           <i class="fa fa-bars"></i>
         </a>
         <a href="/" class="w3-bar-item w3-button">HOME</a>
-        <a href="/loginEncryption" class="w3-bar-item w3-button w3-hide-small"><i class="fa fa-user"></i> LOGIN</a>
-        <a href="/registerEncryption" class="w3-bar-item w3-button w3-hide-small"><i class="fa fa-th"></i> REGISTER</a>
+        <a href="/loginEncryptionAndKey" class="w3-bar-item w3-button w3-hide-small"><i class="fa fa-user"></i> LOGIN</a>
+        <a href="/registerEncryptionAndKey" class="w3-bar-item w3-button w3-hide-small"><i class="fa fa-th"></i> REGISTER</a>
         </a>
       </div>
     
       <!-- Navbar on small screens -->
       <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium">
-        <a href="/loginEncryption" class="w3-bar-item w3-button" onclick="toggleFunction()">LOGIN</a>
-        <a href="/registerEncryption" class="w3-bar-item w3-button" onclick="toggleFunction()">REGISTER</a>
+        <a href="/loginEncryptionAndKey" class="w3-bar-item w3-button" onclick="toggleFunction()">LOGIN</a>
+        <a href="/registerEncryptionAndKey" class="w3-bar-item w3-button" onclick="toggleFunction()">REGISTER</a>
       </div>
     </div>
     
@@ -83,7 +83,7 @@
           <br>
           <input type="submit" value="login"><br>
         </form>
-        <a href="/registerEncryption">Don't have an account? Register</a>
+        <a href="/registerEncryptionAndKey">Don't have an account? Register</a>
       </div>
     </div>
      
@@ -100,7 +100,7 @@
         displayErr.textContent = ''
         displaySuc.textContent = ''
         try {
-          const res = await fetch('/api/auth/loginEncryption', {
+          const res = await fetch('/api/auth/loginEncryptionAndKey', {
             method: 'POST',
             body: JSON.stringify({ username: username.value, password: password.value }),
             headers: { 'Content-Type': 'application/json' }
