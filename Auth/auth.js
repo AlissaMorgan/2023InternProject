@@ -82,7 +82,7 @@ function encrypt(text) {
 }
 
 // Decrypting text
-function decrypt(text) {
+function decrypt(text, key) {
   let iv = Buffer.from(text.iv, 'hex');
   let encryptedText = Buffer.from(text.encryptedData, 'hex');
   let decipher = crypto.createDecipheriv(algorithm, Buffer.from(key), iv);
@@ -237,7 +237,7 @@ exports.loginEncryptionAndKey = async (req, res, next) => {
         console.log("MongoDB Connect to KeyDB is Closed");
       });
       // compare decrypted password to text password
-      var decryptInfo = decrypt(user.password);
+      var decryptInfo = decrypt(user.password, key);
       password == decryptInfo ?
       res.status(200).json({
               message: "Login successful",
