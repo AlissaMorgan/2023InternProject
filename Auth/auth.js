@@ -74,8 +74,9 @@ exports.login = async (req, res, next) => {
 };
 
 //Encrypting text
-function encrypt(text) {
-  let cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
+function encrypt(text, key) {
+  let localKey = Buffer.from(key);
+  let cipher = crypto.createCipheriv(algorithm, localKey, iv);
   let encrypted = cipher.update(text);
   encrypted = Buffer.concat([encrypted, cipher.final()]);
   return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };
@@ -85,7 +86,7 @@ function encrypt(text) {
 function decrypt(text, key) {
   let iv = Buffer.from(text.iv, 'hex');
   let encryptedText = Buffer.from(text.encryptedData, 'hex');
-  let decipher = crypto.createDecipheriv(algorithm, Buffer.from(key), iv);
+  let decipher = crypto.createDecipheriv(algorithm, Buffer.from(key, 'hex'), iv);
   let decrypted = decipher.update(encryptedText);
   decrypted = Buffer.concat([decrypted, decipher.final()]);
   return decrypted.toString();
@@ -97,7 +98,7 @@ exports.registerEncryption = async (req, res, next) => {
   if (password.length < 6) {
     return res.status(400).json({ message: "Password less than 6 characters" });
   }
-  var encryptedInfo = encrypt(password);
+  var encryptedInfo = encrypt(password, key);
     await User.create({
       username: username,
       password: encryptedInfo,
@@ -134,7 +135,7 @@ exports.loginEncryption = async (req, res, next) => {
       })
     } else {
       // compare decrypted password to text password
-      var decryptInfo = decrypt(user.password);
+      var decryptInfo = decrypt(user.password, key);
       password == decryptInfo ?
       res.status(200).json({
               message: "Login successful",
@@ -157,7 +158,8 @@ exports.registerEncryptionAndKey = async (req, res, next) => {
     return res.status(400).json({ message: "Password less than 6 characters" });
   }
   try{
-    var encryptedInfo = encrypt(password);
+    const localKey = crypto.randomBytes(16).toString('hex');
+    var encryptedInfo = encrypt(password, localKey);
     await User.create({
       username: username,
       password: encryptedInfo,
@@ -175,7 +177,7 @@ exports.registerEncryptionAndKey = async (req, res, next) => {
           const keyModel = mongoose.model('keyModel', KeySchema);
           await keyModel.create({
             username: user.username,
-            key: "12345678123456781234567812345678",
+            key: localKey,
           });
       keyDB.close();
       keyDB.once("disconnected", function () {
@@ -231,7 +233,6 @@ exports.loginEncryptionAndKey = async (req, res, next) => {
         });
           const keyModel = mongoose.model('keyModel', KeySchema);
           const userKey = await keyModel.findOne({ username });
-          console.log(userKey);
       keyDB.close();
       keyDB.once("disconnected", function () {
         console.log("MongoDB Connect to KeyDB is Closed");
