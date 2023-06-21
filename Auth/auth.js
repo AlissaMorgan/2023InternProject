@@ -295,8 +295,6 @@ exports.deleteAllUsers = async (req, res, next) => {
       keyDB.once("disconnected", function () {
         console.log("MongoDB Connect to KeyDB is Closed");
       });
-    })
-    .then((users) => {
       const userFunction = users.map((user) => user.deleteOne());
       res.status(200).json({ user: userFunction });
     })
