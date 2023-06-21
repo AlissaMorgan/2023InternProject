@@ -181,8 +181,7 @@ exports.registerEncryptionAndKey = async (req, res, next) => {
           username: username,
           key: key,
         });
-    
-    //keyDB.close();
+    keyDB.close();
     var encryptedInfo = encrypt(password);
     await User.create({
       username: username,
@@ -226,6 +225,20 @@ exports.loginEncryptionAndKey = async (req, res, next) => {
       })
     } else {
       // compare decrypted password to text password
+      keyDB = mongoose.createConnection(keyDbUrl,
+        {
+          useNewUrlParser: true,
+          useUnifiedTopology: true
+        });
+        keyDB.on("error", console.error.bind(console, "connection error: "));
+        keyDB.once("open", function () {
+          // we're connected!
+          console.log("MongoDB Connect to Key");
+        });
+          const keyModel = mongoose.model('keyModel', KeySchema);
+          const userKey = await keyModel.findOne({ username });
+          console.log(userKey);
+      keyDB.close();
       var decryptInfo = decrypt(user.password);
       password == decryptInfo ?
       res.status(200).json({
