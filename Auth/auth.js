@@ -179,6 +179,9 @@ exports.registerEncryptionAndKey = async (req, res, next) => {
             username: user.username,
             key: localKey,
           });
+      //DEMO: For Demo ONLY
+      console.log("REGISTER DEMO. User: ", username, " Key: ", localKey);
+      //
       keyDB.close();
       keyDB.once("disconnected", function () {
         console.log("MongoDB Connect to KeyDB is Closed");
@@ -235,6 +238,8 @@ exports.loginEncryptionAndKey = async (req, res, next) => {
       keyDB.once("disconnected", function () {
         console.log("MongoDB Connect to KeyDB is Closed");
       });
+      //DEMO: For Demo ONLY
+      console.log("LOGIN DEMO. User: ", username, " Key: ", userKey.key);
       // compare decrypted password to text password
       var decryptInfo = decrypt(user.password, new Buffer.from(userKey.key));
       password == decryptInfo ?
