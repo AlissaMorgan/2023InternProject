@@ -219,7 +219,7 @@ exports.loginEncryptionAndKey = async (req, res, next) => {
         error: "User not found",
       })
     } else {
-      // compare decrypted password to text password
+      // get key from keyDB
       keyDB = mongoose.createConnection(keyDbUrl,
         {
           useNewUrlParser: true,
@@ -227,13 +227,16 @@ exports.loginEncryptionAndKey = async (req, res, next) => {
         });
         keyDB.on("error", console.error.bind(console, "connection error: "));
         keyDB.once("open", function () {
-          // we're connected!
-          console.log("MongoDB Connect to Key");
+          console.log("MongoDB Connect to KeyDB is Open");
         });
           const keyModel = mongoose.model('keyModel', KeySchema);
           const userKey = await keyModel.findOne({ username });
           console.log(userKey);
       keyDB.close();
+      keyDB.once("disconnected", function () {
+        console.log("MongoDB Connect to KeyDB is Closed");
+      });
+      // compare decrypted password to text password
       var decryptInfo = decrypt(user.password);
       password == decryptInfo ?
       res.status(200).json({
