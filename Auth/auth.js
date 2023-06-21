@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs")
 //Checking the crypto module
 const crypto = require('crypto');
 const algorithm = 'aes-256-cbc'; //Using AES encryption
-const key = new Buffer.from('12345678123456781234567812345678');
+const key = "12345678123456781234567812345678";
 const iv = crypto.randomBytes(16);
 //Keys DB
 const mongoose = require("mongoose");
@@ -135,7 +135,7 @@ exports.loginEncryption = async (req, res, next) => {
       })
     } else {
       // compare decrypted password to text password
-      var decryptInfo = decrypt(user.password, key);
+      var decryptInfo = decrypt(user.password, new Buffer.from(key));
       password == decryptInfo ?
       res.status(200).json({
               message: "Login successful",
