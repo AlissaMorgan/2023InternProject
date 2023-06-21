@@ -150,15 +150,6 @@ exports.loginEncryption = async (req, res, next) => {
   }
 };
 
-const connectDBKey = async () => {
-  try{
-    await mongoose.createConnection(keyDbUrl);
-  console.log("MongoDB Connected: Key")
-  }catch(err){
-    console.log(err);
-  }
-}
-
 //Create W/ encryption and Key DB
 exports.registerEncryptionAndKey = async (req, res, next) => {
   const { username, password } = req.body;
@@ -166,39 +157,43 @@ exports.registerEncryptionAndKey = async (req, res, next) => {
     return res.status(400).json({ message: "Password less than 6 characters" });
   }
   try{
-    keyDB = mongoose.createConnection(keyDbUrl,
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      });
-      keyDB.on("error", console.error.bind(console, "connection error: "));
-      keyDB.once("open", function () {
-        // we're connected!
-        console.log("MongoDB Connect to Key");
-      });
-        const keyModel = mongoose.model('keyModel', KeySchema);
-        await keyModel.create({
-          username: username,
-          key: key,
-        });
-    keyDB.close();
     var encryptedInfo = encrypt(password);
     await User.create({
       username: username,
       password: encryptedInfo,
     })
-      .then((user) =>
-        res.status(200).json({
-          message: "User successfully created",
-            user,
-        })
-      )
-      .catch((error) =>
-        res.status(400).json({
-          message: "User not successful created",
-          error: error.message,
-        })
-      );
+    .then(async (user) => {
+      keyDB = mongoose.createConnection(keyDbUrl,
+        {
+          useNewUrlParser: true,
+          useUnifiedTopology: true
+        });
+        keyDB.on("error", console.error.bind(console, "connection error: "));
+        keyDB.once("open", function () {
+          console.log("MongoDB Connect to KeyDB is Open");
+        });
+          const keyModel = mongoose.model('keyModel', KeySchema);
+          await keyModel.create({
+            username: user.username,
+            key: key,
+          });
+      keyDB.close();
+      keyDB.once("disconnected", function () {
+        console.log("MongoDB Connect to KeyDB is Closed");
+      });
+    })
+    .then((user) =>
+      res.status(200).json({
+        message: "User successfully created",
+          user,
+      })
+    )
+    .catch((error) =>
+      res.status(400).json({
+        message: "User not successful created",
+        error: error.message,
+      })
+    );
   }catch (error) {
     res.status(400).json({
       message: "An error occurred",
