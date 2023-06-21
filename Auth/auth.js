@@ -7,6 +7,10 @@ const crypto = require('crypto');
 const algorithm = 'aes-256-cbc'; //Using AES encryption
 const key = new Buffer.from('12345678123456781234567812345678');
 const iv = crypto.randomBytes(16);
+//Keys DB
+const mongoose = require("mongoose");
+const keyDbUrl = 'mongodb://127.0.0.1:27017/storingKeysDB';
+const KeySchema = require("../models/Key");
 
 //Create
 exports.register = async (req, res, next) => {
@@ -146,13 +150,40 @@ exports.loginEncryption = async (req, res, next) => {
   }
 };
 
+const connectDBKey = async () => {
+  try{
+    await mongoose.createConnection(keyDbUrl);
+  console.log("MongoDB Connected: Key")
+  }catch(err){
+    console.log(err);
+  }
+}
+
 //Create W/ encryption and Key DB
 exports.registerEncryptionAndKey = async (req, res, next) => {
   const { username, password } = req.body;
   if (password.length < 6) {
     return res.status(400).json({ message: "Password less than 6 characters" });
   }
-  var encryptedInfo = encrypt(password);
+  try{
+    keyDB = mongoose.createConnection(keyDbUrl,
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      });
+      keyDB.on("error", console.error.bind(console, "connection error: "));
+      keyDB.once("open", function () {
+        // we're connected!
+        console.log("MongoDB Connect to Key");
+      });
+        const keyModel = mongoose.model('keyModel', KeySchema);
+        await keyModel.create({
+          username: username,
+          key: key,
+        });
+    
+    //keyDB.close();
+    var encryptedInfo = encrypt(password);
     await User.create({
       username: username,
       password: encryptedInfo,
@@ -169,6 +200,12 @@ exports.registerEncryptionAndKey = async (req, res, next) => {
           error: error.message,
         })
       );
+  }catch (error) {
+    res.status(400).json({
+      message: "An error occurred",
+      error: error.message,
+    })
+  }
 };
 
 //Read W/ encryption and Key db

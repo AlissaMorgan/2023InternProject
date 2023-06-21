@@ -1,7 +1,7 @@
 const express = require("express")
 const connectDBEncrypt = require("./dbEncrypt");
-const app = express()
-const PORT = 5000
+const app = express();
+const PORT = 5001
 
 app.set("view engine", "ejs");
 

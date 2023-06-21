@@ -5,10 +5,7 @@ const localDB = 'mongodb://127.0.0.1:27017/internProj';
 
 const connectDBKeys = async () => {
   try{
-    await Mongoose.connect(localDB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+    await Mongoose.createConnection(localDB);
   console.log("MongoDB Connected: Keys")
   }catch(err){
     console.log(err);
