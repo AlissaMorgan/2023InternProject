@@ -5,12 +5,62 @@ const bcrypt = require("bcryptjs")
 //Checking the crypto module
 const crypto = require('crypto');
 const algorithm = 'aes-256-cbc'; //Using AES encryption
-//const key = "12345678123456781234567812345678"; //For loginEncryption and registerEncryption routes
 const iv = crypto.randomBytes(16);
 //Keys DB
 const mongoose = require("mongoose");
 const keyDbUrl = 'mongodb://127.0.0.1:27017/storingKeysDB';
 const KeySchema = require("../models/Key");
+
+//Encrypting text
+function encrypt(text, key = "12345678123456781234567812345678") {
+  let localKey = Buffer.from(key);
+  let cipher = crypto.createCipheriv(algorithm, localKey, iv);
+  let encrypted = cipher.update(text);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };
+}
+
+// Decrypting text
+function decrypt(text, key = new Buffer.from("12345678123456781234567812345678")) {
+  let iv = Buffer.from(text.iv, 'hex');
+  let encryptedText = Buffer.from(text.encryptedData, 'hex');
+  let decipher = crypto.createDecipheriv(algorithm, Buffer.from(key, 'hex'), iv);
+  let decrypted = decipher.update(encryptedText);
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+  return decrypted.toString();
+}
+
+exports.encrypt = async (req, res, next) => {
+  try{
+    const { text, key} = req.body;
+    var encryptedInfo = encrypt(text, key);
+    res.status(200).json({
+        message: "Encryption Successful",
+        encryptedData: encryptedInfo,
+    })
+  }catch(error){
+    res.status(400).json({
+      message: "Encryption Failed",
+      error: error.message,
+    })
+  }
+}
+
+exports.decrypt = async (req, res, next) => {
+  try{
+    const { text, key } = req.body;
+    var encryptedInfo = decrypt(text, key);
+    res.status(200).json({
+        message: "Decryption Successful",
+        encryptedData: encryptedInfo,
+    })
+  }catch(error){
+    res.status(400).json({
+      message: "Decryption Failed",
+      error: error.message,
+    })
+  }
+}
 
 //Create
 exports.register = async (req, res, next) => {
@@ -73,32 +123,13 @@ exports.login = async (req, res, next) => {
   }
 };
 
-//Encrypting text
-function encrypt(text, key) {
-  let localKey = Buffer.from(key);
-  let cipher = crypto.createCipheriv(algorithm, localKey, iv);
-  let encrypted = cipher.update(text);
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-  return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };
-}
-
-// Decrypting text
-function decrypt(text, key) {
-  let iv = Buffer.from(text.iv, 'hex');
-  let encryptedText = Buffer.from(text.encryptedData, 'hex');
-  let decipher = crypto.createDecipheriv(algorithm, Buffer.from(key, 'hex'), iv);
-  let decrypted = decipher.update(encryptedText);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  return decrypted.toString();
-}
-
 //Create W/ encryption
 exports.registerEncryption = async (req, res, next) => {
   const { username, password } = req.body;
   if (password.length < 6) {
     return res.status(400).json({ message: "Password less than 6 characters" });
   }
-  var encryptedInfo = encrypt(password, key);
+  var encryptedInfo = encrypt(password);
     await User.create({
       username: username,
       password: encryptedInfo,
@@ -135,7 +166,7 @@ exports.loginEncryption = async (req, res, next) => {
       })
     } else {
       // compare decrypted password to text password
-      var decryptInfo = decrypt(user.password, new Buffer.from(key));
+      var decryptInfo = decrypt(user.password);
       password == decryptInfo ?
       res.status(200).json({
               message: "Login successful",
