@@ -20,8 +20,7 @@ function encrypt(text, key = "12345678123456781234567812345678", iv = crypto.ran
 }
 
 // Decrypting text
-function decrypt(text, key = new Buffer.from("12345678123456781234567812345678")) {
-  let iv = Buffer.from(text.iv, 'hex');
+function decrypt(text, key = new Buffer.from("12345678123456781234567812345678"), iv = Buffer.from(text.iv, 'hex')) {
   let encryptedText = Buffer.from(text.encryptedData, 'hex');
   let decipher = crypto.createDecipheriv(algorithm, Buffer.from(key, 'hex'), iv);
   let decrypted = decipher.update(encryptedText);
