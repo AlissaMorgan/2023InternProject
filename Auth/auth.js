@@ -5,14 +5,13 @@ const bcrypt = require("bcryptjs")
 //Checking the crypto module
 const crypto = require('crypto');
 const algorithm = 'aes-256-cbc'; //Using AES encryption
-const iv = crypto.randomBytes(16);
 //Keys DB
 const mongoose = require("mongoose");
 const keyDbUrl = 'mongodb://127.0.0.1:27017/storingKeysDB';
 const KeySchema = require("../models/Key");
 
 //Encrypting text
-function encrypt(text, key = "12345678123456781234567812345678") {
+function encrypt(text, key = "12345678123456781234567812345678", iv = crypto.randomBytes(16)) {
   let localKey = Buffer.from(key);
   let cipher = crypto.createCipheriv(algorithm, localKey, iv);
   let encrypted = cipher.update(text);
