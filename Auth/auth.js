@@ -11,7 +11,7 @@ const keyDbUrl = 'mongodb://127.0.0.1:27017/storingKeysDB';
 const KeySchema = require("../models/Key");
 
 //Encrypting text for database
-function encryptNoIv(text, key, iv) {
+function encryptNotRandom(text, key, iv) {
   let localKey = Buffer.from(key);
   let cipher = crypto.createCipheriv(algorithm, localKey, iv);
   let encrypted = cipher.update(text);
@@ -20,8 +20,7 @@ function encryptNoIv(text, key, iv) {
 }
 
 // Decrypting text
-function decryptNoIv(text, key, iv) {
-  //let iv = Buffer.from(givenIv, 'hex');
+function decryptNotRandom(text, key, iv) {
   let encryptedText = Buffer.from(text, 'hex');
   let decipher = crypto.createDecipheriv(algorithm, key, iv);
   let decrypted = decipher.update(encryptedText);
@@ -33,7 +32,7 @@ exports.encrypt = async (req, res, next) => {
   try{
     const { text, key} = req.body;
     let iv = Buffer.from("1234567812345678");
-    var encryptedInfo = encryptNoIv(text, key, iv);
+    var encryptedInfo = encryptNotRandom(text, key, iv);
     res.status(200).json({
         message: "Encryption Successful",
         encryptedData: encryptedInfo.encryptedData,
@@ -51,7 +50,7 @@ exports.decrypt = async (req, res, next) => {
     const { text, key } = req.body;
     text.encryptedData = text;
     let iv = "1234567812345678";
-    var encryptedInfo = decryptNoIv(text, key, iv);
+    var encryptedInfo = decryptNotRandom(text, key, iv);
     res.status(200).json({
         message: "Decryption Successful",
         encryptedData: encryptedInfo,
