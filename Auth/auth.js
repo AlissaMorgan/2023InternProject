@@ -10,8 +10,9 @@ const mongoose = require("mongoose");
 const keyDbUrl = 'mongodb://127.0.0.1:27017/storingKeysDB';
 const KeySchema = require("../models/Key");
 
-//Encrypting text
-function encrypt(text, key = "12345678123456781234567812345678", iv = crypto.randomBytes(16)) {
+//Encrypting text for database
+function encrypt(text, key = "12345678123456781234567812345678") {
+  let iv = crypto.randomBytes(16);
   let localKey = Buffer.from(key);
   let cipher = crypto.createCipheriv(algorithm, localKey, iv);
   let encrypted = cipher.update(text);
@@ -20,7 +21,8 @@ function encrypt(text, key = "12345678123456781234567812345678", iv = crypto.ran
 }
 
 // Decrypting text
-function decrypt(text, key = new Buffer.from("12345678123456781234567812345678"), iv = Buffer.from(text.iv, 'hex')) {
+function decrypt(text, key = new Buffer.from("12345678123456781234567812345678")) {
+  let iv = Buffer.from(text.iv, 'hex');
   let encryptedText = Buffer.from(text.encryptedData, 'hex');
   let decipher = crypto.createDecipheriv(algorithm, Buffer.from(key, 'hex'), iv);
   let decrypted = decipher.update(encryptedText);
@@ -31,10 +33,11 @@ function decrypt(text, key = new Buffer.from("12345678123456781234567812345678")
 exports.encrypt = async (req, res, next) => {
   try{
     const { text, key} = req.body;
-    var encryptedInfo = encrypt(text, key);
+    let iv = Buffer.from("1234567812345678");
+    var encryptedInfo = encrypt(text, key, iv);
     res.status(200).json({
         message: "Encryption Successful",
-        encryptedData: encryptedInfo,
+        encryptedData: encryptedInfo.encryptedData,
     })
   }catch(error){
     res.status(400).json({
@@ -47,7 +50,9 @@ exports.encrypt = async (req, res, next) => {
 exports.decrypt = async (req, res, next) => {
   try{
     const { text, key } = req.body;
-    var encryptedInfo = decrypt(text, key);
+    text.encryptedData = text;
+    let iv = Buffer.from("1234567812345678", 'hex');
+    var encryptedInfo = decrypt(text, key, iv);
     res.status(200).json({
         message: "Decryption Successful",
         encryptedData: encryptedInfo,
