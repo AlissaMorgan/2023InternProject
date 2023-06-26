@@ -11,8 +11,7 @@ const keyDbUrl = 'mongodb://127.0.0.1:27017/storingKeysDB';
 const KeySchema = require("../models/Key");
 
 //Encrypting text for database
-function encrypt(text, key = "12345678123456781234567812345678") {
-  let iv = crypto.randomBytes(16);
+function encryptNoIv(text, key, iv) {
   let localKey = Buffer.from(key);
   let cipher = crypto.createCipheriv(algorithm, localKey, iv);
   let encrypted = cipher.update(text);
@@ -21,10 +20,10 @@ function encrypt(text, key = "12345678123456781234567812345678") {
 }
 
 // Decrypting text
-function decrypt(text, key = new Buffer.from("12345678123456781234567812345678")) {
-  let iv = Buffer.from(text.iv, 'hex');
-  let encryptedText = Buffer.from(text.encryptedData, 'hex');
-  let decipher = crypto.createDecipheriv(algorithm, Buffer.from(key, 'hex'), iv);
+function decryptNoIv(text, key, iv) {
+  //let iv = Buffer.from(givenIv, 'hex');
+  let encryptedText = Buffer.from(text, 'hex');
+  let decipher = crypto.createDecipheriv(algorithm, key, iv);
   let decrypted = decipher.update(encryptedText);
   decrypted = Buffer.concat([decrypted, decipher.final()]);
   return decrypted.toString();
@@ -34,7 +33,7 @@ exports.encrypt = async (req, res, next) => {
   try{
     const { text, key} = req.body;
     let iv = Buffer.from("1234567812345678");
-    var encryptedInfo = encrypt(text, key, iv);
+    var encryptedInfo = encryptNoIv(text, key, iv);
     res.status(200).json({
         message: "Encryption Successful",
         encryptedData: encryptedInfo.encryptedData,
@@ -51,13 +50,14 @@ exports.decrypt = async (req, res, next) => {
   try{
     const { text, key } = req.body;
     text.encryptedData = text;
-    let iv = Buffer.from("1234567812345678", 'hex');
-    var encryptedInfo = decrypt(text, key, iv);
+    let iv = "1234567812345678";
+    var encryptedInfo = decryptNoIv(text, key, iv);
     res.status(200).json({
         message: "Decryption Successful",
         encryptedData: encryptedInfo,
     })
   }catch(error){
+    console.log(error);
     res.status(400).json({
       message: "Decryption Failed",
       error: error.message,
@@ -125,6 +125,26 @@ exports.login = async (req, res, next) => {
     })
   }
 };
+
+//Encrypting text for database
+function encrypt(text, key = "12345678123456781234567812345678") {
+  let iv = crypto.randomBytes(16);
+  let localKey = Buffer.from(key);
+  let cipher = crypto.createCipheriv(algorithm, localKey, iv);
+  let encrypted = cipher.update(text);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };
+}
+
+// Decrypting text
+function decrypt(text, key = new Buffer.from("12345678123456781234567812345678")) {
+  let iv = Buffer.from(text.iv, 'hex');
+  let encryptedText = Buffer.from(text.encryptedData, 'hex');
+  let decipher = crypto.createDecipheriv(algorithm, Buffer.from(key, 'hex'), iv);
+  let decrypted = decipher.update(encryptedText);
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+  return decrypted.toString();
+}
 
 //Create W/ encryption
 exports.registerEncryption = async (req, res, next) => {
